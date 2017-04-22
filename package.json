@@ -1,0 +1,81 @@
+{
+  "name": "comment",
+  "version": "1.0.0",
+  "description": "hiredchina user microservices",
+  "main": "index.js",
+  "scripts": {
+    "start": "export NODE_ENV=development && ./node_modules/.bin/supervisor ./bin/www",
+    "production": "export NODE_ENV=production && ./node_modules/.bin/supervisor ./bin/www",
+    "development": "export NODE_ENV=development && ./node_modules/.bin/supervisor ./bin/www",
+    "test": "standard && export NODE_ENV=development && ./node_modules/.bin/nyc ./node_modules/.bin/ava -v",
+    "report": "./node_modules/.bin/nyc report --reporter=html"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ThomasLiu/comment.git"
+  },
+  "author": "Thomas Lau",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ThomasLiu/comment/issues"
+  },
+  "homepage": "https://github.com/ThomasLiu/comment#readme",
+  "dependencies": {
+    "bcryptjs": "^2.3.0",
+    "bluebird": "^3.4.1",
+    "co": "^4.6.0",
+    "debug": "^2.2.0",
+    "ioredis": "^2.2.0",
+    "jsonwebtoken": "^7.1.7",
+    "kcors": "^1.2.1",
+    "koa": "^2.0.0",
+    "koa-bodyparser": "^3.2.0",
+    "koa-compress": "^1.0.9",
+    "koa-convert": "^1.2.0",
+    "koa-csrf": "^2.5.0",
+    "koa-generic-session": "^1.11.3",
+    "koa-helmet": "^2.0.0",
+    "koa-json": "^1.1.3",
+    "koa-log4": "^2.0.1",
+    "koa-logger": "^1.3.0",
+    "koa-redis": "^2.1.1",
+    "koa-router": "^5.4.0",
+    "koa-static": "^2.0.0",
+    "koa-static-cache": "^3.1.7",
+    "koa-views": "^4.1.0",
+    "kp": "^1.1.0",
+    "lodash": "^4.14.1",
+    "mongoose": "^4.9.5",
+    "pm2": "^1.1.3",
+    "require-directory": "^2.1.1",
+    "runkoa": "^1.5.2",
+    "sequelize": "^3.23.6",
+    "utility": "^1.12.0",
+    "validator": "^5.5.0"
+  },
+  "devDependencies": {
+    "ava": "^0.15.2",
+    "babel-eslint": "^7.0.0",
+    "gulp": "^3.9.1",
+    "gulp-ava": "^0.12.1",
+    "nyc": "^8.3.1",
+    "sinon": "^1.17.5",
+    "standard": "^7.1.2",
+    "superkoa": "^1.0.1",
+    "supervisor": "^0.11.0",
+    "zombie": "^4.2.1"
+  },
+  "engines": {
+    "node": ">= 4.0"
+  },
+  "standard": {
+    "globals": [
+      "Config"
+    ],
+    "parser": "babel-eslint",
+    "ignore": [
+      "app/",
+      "public/**/*"
+    ]
+  }
+}
