@@ -1,21 +1,32 @@
 # comment
 
-## quick start
+### quick start
+```
 git clone https://github.com/ThomasLiu/comment.git
 cd comment
 npm install
+```
 
-## Run test
+### Run test
+```
 npm run test
+```
 
-## Run 
+### Run 
+```
 npm start
+```
 
-## Run pm2 for production
+### Run pm2 for production
+```
 NODE_ENV=production pm2 start bin/www -i 0 --name 'commnet'
+```
 
-## Run pm2 for test
+### Run pm2 for test
+```
 NODE_ENV=test pm2 start bin/www -i 0 --name 'test-commnet'
+```
 
+ad
 
-## API
+### API
