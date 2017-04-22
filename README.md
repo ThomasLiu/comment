@@ -1,6 +1,5 @@
-# comment
 
-## quick start
+### Quick start
 ```
 git clone https://github.com/ThomasLiu/comment.git
 cd comment
@@ -63,14 +62,14 @@ POST   /api/comments[/]        => comments.api.create()<br>
 PATCH  /api/comments/:id       => comments.api.update()<br>
 DELETE /api/comments/:id       => comments.api.destroy()<br>
 
-###### GET    /api/comments[/]
-####### 参数
+##### GET    /api/comments[/]
+###### 参数
 **page** *int* 选填 获取列表的第几页， 默认值为 1<br>
 **limit** *int* 选填 一页中获取多小个对象， 默认值为 /config/sys.js 的list_count<br>
 **sort** *string* 选填 按照怎样的规则排序，参数规则按mongoose的sort规则，将对例 JSON.stringify({createdAt: -1})， 默认值为 '{"createdAt": -1}'<br>
 **where** *string* 选填 按照怎样的规则搜索，参数规则按mongoose的find()的参数规则，例 JSON.stringify({attribute1: 'a'})，没有参数是搜索全部 ，没有默认值<br>
 **attributes** *string* 选填 返回的列表对象中的字段，例 JSON.stringify(['attribute1','attribute2','attribute3'])，没有参数时显示全部字段 ，没有默认值<br>
-####### 返回json
+###### 返回json
 ```
 {
     "data": {
@@ -91,11 +90,11 @@ DELETE /api/comments/:id       => comments.api.destroy()<br>
 }
 ```
 
-###### GET    /api/comments/:id
-####### 参数
+##### GET    /api/comments/:id
+###### 参数
 **id** *ObjectId* 必填 需要获取对象的id<br>
 
-####### 返回json
+###### 返回json
 ```
 {
     "data": {
@@ -111,11 +110,11 @@ DELETE /api/comments/:id       => comments.api.destroy()<br>
 }
 ```
 
-###### POST   /api/comments[/]
-####### 参数
+##### POST   /api/comments[/]
+###### 参数
 将需要保存的对象属性作为参数 post
 
-####### 返回json
+###### 返回json
 ```
 {
     "data": {
@@ -133,12 +132,12 @@ DELETE /api/comments/:id       => comments.api.destroy()<br>
 }
 ```
 
-###### PATCH  /api/comments/:id
-####### 参数
+##### PATCH  /api/comments/:id
+###### 参数
 **id** *ObjectId* 必填 需要更新对象的id<br>
 将需要更新的对象属性作为参数 post
 
-####### 返回json
+###### 返回json
 ```
 {
     "data": {
@@ -158,11 +157,11 @@ DELETE /api/comments/:id       => comments.api.destroy()<br>
 }
 ```
 
-###### DELETE /api/comments/:id 
-####### 参数
+##### DELETE /api/comments/:id 
+###### 参数
 **id** *ObjectId* 必填 需要删除对象的id<br>
 
-####### 返回json
+###### 返回json
 ```
 {
     "data": {
