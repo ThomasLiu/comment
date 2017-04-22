@@ -11,8 +11,8 @@ var config = {
   list_count: 20,
 
   host: 'http://localhost:3008',
-  appId: '1dw134C11234g1341I',
-  appSecret: 'qwerV13r113thGp231'
+  appId: 'd41d8cd98f00b204e9800998ecf8427e',
+  appSecret: 'abf5b082009649ca1b2f6136e8e75e7c'
 }
 
 if (process.env.NODE_ENV === 'production') {

@@ -6,6 +6,20 @@ class BaseModel {
         this.model = model
     }
 
+    findOne (obj) {
+        var Model = this.model
+        return new Promise(function(resolve, reject) {
+            Model.findOne(obj, function (err, result) {
+                if (err) {
+                    logger.error(`findOne err : ${err}`)
+                    reject(err)
+                } else {
+                    resolve(result)
+                }
+            })
+        })
+    }
+
     findById (id) {
         var Model = this.model
         return new Promise(function(resolve, reject) {

@@ -1,43 +1,21 @@
 "use strict"
 
 const validator = require('validator')
-const md5 = require('js-md5')
 
 const logger = require('../common/logger')(__filename.replace(__dirname, ''))
 const log = require('../common/require_logger_util')
 const restful = require('../common/restful_util')
-const apiFormat = require('../common/res_api_format')
 
 const $models = require('../common/mount-models')(__dirname)
-const AppSecret = $models.appSecret
+const Report = $models.report
 
 // -- custom api
 exports.api = {
-    getNew: function *(next){
-        log(logger, '/api/appSecrets/new => api.getNew', this)
-
-        var l = (new Date()).getTime()
-
-        var appSecret = {
-            appId : md5(l),
-            appSecret : md5(`${l - 10000}comment`)
-        }
-
-        yield _create(appSecret)
-        var data = {
-            success: false,
-            message: '请记住您的 appId 和 appSecret，只生成一次。每组appSecret对应一套数据'
-        }
-        data.success = true
-
-        data.result = appSecret
-        this.body = apiFormat.api(data)
-    },
     list: function *(next){
-        log(logger, '/api/appSecrets[/] => api.list', this)
+        log(logger, '/api/reports[/] => api.list', this)
 
         var findObj = {
-            model: AppSecret,
+            model: Report,
             page : this.query.page,
             sort : this.query.sortby,
             limit : this.query.limit
@@ -58,7 +36,7 @@ exports.api = {
 
     },
     create: function *(next){
-        log(logger, '/api/appSecrets[/] => api.create', this)
+        log(logger, '/api/reports[/] => api.create', this)
         
         this.body = yield restful.create({
             body : this.request.body,
@@ -67,16 +45,16 @@ exports.api = {
         })
     },
     show: function *(next){
-        log(logger, '/api/appSecrets/:id => api.show', this)
+        log(logger, '/api/reports/:id => api.show', this)
 
         this.body = yield restful.show({
-            model: AppSecret,
+            model: Report,
             id: this.params.id,
             json : _json
         })
     },
     update: function *(next){
-        log(logger, '/api/appSecrets/:id => api.update', this)
+        log(logger, '/api/reports/:id => api.update', this)
         
         this.body = yield restful.update({
             body: this.request.body,
@@ -87,37 +65,51 @@ exports.api = {
 
     },
     destroy: function *(next){
-        log(logger, '/api/appSecrets/:id => api.destroy', this)
+        log(logger, '/api/reports/:id => api.destroy', this)
 
         this.body = yield restful.destroy({
-            model: AppSecret,
+            model: Report,
             id: this.params.id
         })
     },
 }
 
 var _update = function *(obj, id) {
-    return yield AppSecret.update(obj,id)
+    return yield Report.update(obj,id)
 }
 
 var _create = function *(obj) {
-    return yield AppSecret.create(obj)
+    return yield Report.create(obj)
 }
 
-var _json = (appSecret) => {
+var _json = (report) => {
     return {
-        id : appSecret._id,
-        appId : appSecret.appId,
-        appSecret : appSecret.appSecret,
-        create_at : appSecret.create_at,
-        update_at : appSecret.update_at,
-        createdAtFormat: appSecret.createdAtFormat,
-        updatedAtFormat: appSecret.updatedAtFormnpmat
+        id : report._id,
+
+        ip : report.ip,
+        commentId : report.commentId,
+        threadId : report.threadId,
+        userId : report.userId,
+
+        create_at : report.create_at,
+        update_at : report.update_at,
+        createdAtFormat: report.createdAtFormat,
+        updatedAtFormat: report.updatedAtFormnpmat
     }
 }
 
 var _getEditError = (body) => {
+    const userId = validator.trim(body.userId || '')
+    
+    const commentId = validator.trim(body.commentId || '')
+    const threadId = validator.trim(body.threadId || '')
     var editError
+
+    if ([userId].some(function (item) { return item === ''})) {
+        editError = 'We need your userId'
+    } else if (!(commentId || threadId)){
+        editError = 'We need your threadId or commentId'
+    }
     return editError
 }
 

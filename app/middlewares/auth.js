@@ -9,6 +9,8 @@ function *gen_session(data, t) {
 
     var session = t.session
 
+    session.appSecretId = data.appSecretId
+
     session[Config.auth_cookie_name] = auth_token
     yield t.sessionStore.set(t.sessionId,session)
 }

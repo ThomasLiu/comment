@@ -9,7 +9,9 @@ const tools = require('../common/tools')
 const api = require('../common/api')
 
 const auth = require('../middlewares/auth')
-const authServices = require('../services/auth')
+
+const $models = require('../common/mount-models')(__dirname)
+const AppSecret = $models.appSecret
 
 // -- custom api
 exports.api = {
@@ -21,8 +23,8 @@ exports.api = {
                 title: 'get token',
                 href: `post: ${Config.host}/api/auth`,
                 params: [
-                  {name: 'username' , type: 'string'},
-                  {name: 'password' , type: 'string'},
+                  {name: 'appId' , type: 'string'},
+                  {name: 'appSecret' , type: 'string'},
                 ],
                 res: {
                     data: {
@@ -38,44 +40,42 @@ exports.api = {
             }
         })
     },
-    check: function *(next){
-        logger.info(`${this.method} /api/auth => auth, query: ${JSON.stringify(this.query)} , params: ${JSON.stringify(this.params)} , body: ${JSON.stringify(this.request.body)}`)
-
-        const username = validator.trim(this.request.body.username || '').toLowerCase()
-        const password = validator.trim(this.request.body.password || '')
-
-        var baseCheckRequest
-        if (username && password) {
-            baseCheckRequest = yield api.request({
-                url: `${Config.base_host}/api/auth/check`,
-                method: 'post',
-                send : {username: username , password: password}
-            })
-        }
-
-        this.body = yield authServices.check(this.request.body, baseCheckRequest)
-    },
 
     auth: function *(next){
         logger.info(`${this.method} /api/auth => auth, query: ${JSON.stringify(this.query)} , params: ${JSON.stringify(this.params)} , body: ${JSON.stringify(this.request.body)}`)
 
-        const username = validator.trim(this.request.body.username || '')
-        const password = validator.trim(this.request.body.password || '')
+        const appId = validator.trim(this.request.body.appId || '')
+        const appSecret = validator.trim(this.request.body.appSecret || '')
 
         var editError,
             data = {
                 success: false,
                 message: 'Enjoy your data!'
-            }
-        if (!username) {
-          editError = 'Please enter the username'
-        } else if (!password) {
-          editError = 'Please enter the password'
+            },
+            ojb
+        if (!appId) {
+          editError = 'Please enter the appId'
+        } else if (!appSecret) {
+          editError = 'Please enter the appSecret'
         }
 
         if (!editError) {
-            if (!(username === Config.appId && password === Config.appSecret)) {
-                editError = 'the username or password error'
+            ojb = AppSecret.findOne({
+                appId: appId,
+                appSecret: appSecret
+            })
+            if (ojb) {
+                var new_token = jwt.sign({
+                    id: ojb._id,
+                    appId: appId,
+                    appSecret: appSecret
+                }, Config.session_secret, {
+                    expiresIn : 60 * 10 // 设置过期时间 10分钟
+                })
+                data.token = new_token
+                data.appSecretId = ojb._id
+            } else {
+                editError = 'error appId and appSecret'
             }
         }
 
@@ -83,11 +83,7 @@ exports.api = {
             data.message = editError
             this.body = apiFormat.api_error(data)
         } else {
-            var new_token = jwt.sign({username: username, password: password}, Config.session_secret, {
-                expiresIn : 60 * 10 // 设置过期时间 10分钟
-            })
             data.success = true
-            data.token = new_token
             yield auth.gen_session(data,this)
             this.body = apiFormat.api(data)
         }

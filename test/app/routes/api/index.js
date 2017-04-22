@@ -1,17 +1,19 @@
 import test from 'ava'
 import superkoa from 'superkoa'
+
+var testApp = superkoa('../../app.js')
 //
 // var model = 'users'
 //
 // var user
 //
 // var mockUser = {
-//     // 'username': 'alfred',
-//     // 'password': '000000'
+//     // 'appId': 'alfred',
+//     // 'appSecret': '000000'
 // }
 
 test.before(function * (t) {
-    // var res = yield superkoa('../../app.js')
+    // var res = yield testApp
     //             .post('/api/auth')
     //             .send(mockUser)
     
@@ -34,7 +36,7 @@ test.before(function * (t) {
 
 // *  GET    /api[/]        => index.index()
 test('GET /api[/]', function * (t) {
-    var res = yield superkoa('../../app.js')
+    var res = yield testApp
                 .get('/api/')
     t.is(200, res.status)
 
@@ -44,7 +46,7 @@ test('GET /api[/]', function * (t) {
 //
 // // *  GET    /users[/]        => user.list()
 // test('GET /' + model, function * (t) {
-//    var res = yield superkoa('../../app.js')
+//    var res = yield testApp
 //        .get('/' + model)
 //
 //    t.is(200, res.status)

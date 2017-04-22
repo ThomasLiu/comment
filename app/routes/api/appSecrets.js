@@ -13,7 +13,7 @@ var $ = require('../../common/mount-controllers')(__dirname).appSecrets
  *
  * URL routes:
  *
- *  GET    /api/appSecrets/check     => appSecrets.api.check()
+ *  GET    /api/appSecrets/new       => appSecrets.api.getNew()
  *  GET    /api/appSecrets[/]        => appSecrets.api.list()
  *  GET    /api/appSecrets/:id       => appSecrets.api.show()
  *  POST   /api/appSecrets[/]        => appSecrets.api.create()
@@ -24,15 +24,17 @@ var $ = require('../../common/mount-controllers')(__dirname).appSecrets
 
 // -- custom routes
 
-router.get('/', $middlewares.check_api_token , $.api.list)
+router.get('/new', $.api.getNew)
 
-router.post('/', $middlewares.check_api_token , $.api.create)
+// router.get('/', $middlewares.check_api_token , $.api.list)
 
-router.get('/:id', $middlewares.check_api_token , $.api.show)
+// router.post('/', $middlewares.check_api_token , $.api.create)
 
-router.patch('/:id', $middlewares.check_api_token , $.api.update)
+// router.get('/:id', $middlewares.check_api_token , $.api.show)
 
-router.delete('/:id', $middlewares.check_api_token , $.api.destroy)
+// router.patch('/:id', $middlewares.check_api_token , $.api.update)
+
+// router.delete('/:id', $middlewares.check_api_token , $.api.destroy)
 
 
 module.exports = router

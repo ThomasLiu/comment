@@ -63,10 +63,10 @@ var justRequest = function *({url , method = 'get' , query, send, token}){
 
 
 var getToken = function *(url){
-    var username = Config.appId
-    var password = Config.appSecret
+    var appId = Config.appId
+    var appSecret = Config.appSecret
     var host = _getHost(url)
-    logger.debug(`getToken username :${username}, password:${password}`)
+    logger.debug(`getToken appId :${appId}, appSecret:${appSecret}`)
 
     var cache_token = yield cache.get(`${Config.session_secret}-${host}-api-token`)
 
@@ -86,19 +86,19 @@ var getToken = function *(url){
 }
 
 var getTokenRequest = function *(url){
-    var username = Config.appId
-    var password = Config.appSecret
+    var appId = Config.appId
+    var appSecret = Config.appSecret
     var host = _getHost(url)
     var getTokenUrl = `http://${host}/api/auth`
 
-    logger.debug(`getTokenRequest ${getTokenUrl} username :${username}, password:${password}`)
+    logger.debug(`getTokenRequest ${getTokenUrl} appId :${appId}, appSecret:${appSecret}`)
 
     var err, data, res
 
     try {
         res = yield superagent.post(getTokenUrl)
         .type('json')
-        .send({username: username, password: password})
+        .send({appId: appId, appSecret: appSecret})
 
         if (!res.ok) {
             err = `getToken error: request.post not ok`
