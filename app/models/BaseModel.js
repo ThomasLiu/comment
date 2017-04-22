@@ -35,7 +35,7 @@ class BaseModel {
     }
 
     findAndCountAll ({
-        where, offset, limit, order = '-createdAt', field = {}
+        where, offset, limit, sort = {createdAt: -1}, field = {}
     }) {
         var Model = this.model
         return new Promise(function(resolve, reject) {
@@ -53,7 +53,7 @@ class BaseModel {
                         {   
                             skip: offset, 
                             limit: limit, 
-                            sort: order
+                            sort: sort
                         }, function (err, result) {
                             if (err) {
                                 logger.error(`findAndCountAll err : ${err}`)

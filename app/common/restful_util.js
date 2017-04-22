@@ -3,10 +3,14 @@ const apiFormat = require('./res_api_format')
 const logger = require('../common/logger')(__filename.replace(__dirname, ''))
 
 
-exports.list = function *({model, where, page, sort = '-createdAt', limit = Config.list_count, attributes}){
+exports.list = function *({model, where, page, sort, limit = Config.list_count, attributes}){
     page = parseInt(page, 10) || 1
     page = page > 0 ? page : 1
     limit = parseInt(limit)
+
+    if (sort) {
+        sort = JSON.parse(sort)
+    }
 
     var data = {
         success: false,
@@ -17,7 +21,7 @@ exports.list = function *({model, where, page, sort = '-createdAt', limit = Conf
         where : where,
         offset: (page - 1) * limit,
         limit: limit,
-        order: sort,
+        sort: sort,
         field: attributes
     })
 
@@ -77,7 +81,7 @@ exports.update = function *({body, id, getEditError, update}){
 
     var data = {
         success: false,
-        message: 'Enjoy your data!'
+        message: 'update success!'
     }
 
     if (!editError) {
