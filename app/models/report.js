@@ -11,6 +11,8 @@ var ObjectId  = Schema.ObjectId
 var ReportSchema = new Schema({
     
     ip : {type: String},
+    message: {type: String},   //评论内容
+
     commentId: { type: ObjectId , ref: 'Comment' },  //评论Id
     threadId: { type: ObjectId , ref: 'Thread' },    //评论实例Id
     userId: { type: ObjectId , ref: 'User' },        //操作用户Id

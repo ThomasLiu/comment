@@ -60,13 +60,13 @@ exports.api = {
         }
 
         if (!editError) {
-            ojb = AppSecret.findOne({
+            ojb = yield AppSecret.findOne({
                 appId: appId,
                 appSecret: appSecret
             })
             if (ojb) {
                 var new_token = jwt.sign({
-                    id: ojb._id,
+                    appSecretId: `${ojb._id}`,
                     appId: appId,
                     appSecret: appSecret
                 }, Config.session_secret, {

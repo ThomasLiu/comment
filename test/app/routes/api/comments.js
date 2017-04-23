@@ -20,7 +20,6 @@ var mock = {
     parentId: new ObjectId(),  //回复评论Id
     threadId: new ObjectId(),   //评论实例Id
     userId: new ObjectId(),       //评论用户Id
-    appSecretId : new ObjectId(),  //开发者用户Id
 }
 
 var mockUpdate = {
@@ -37,7 +36,6 @@ var mockUpdate = {
     parentId: new ObjectId(),  //回复评论Id
     threadId: new ObjectId(),   //评论实例Id
     userId: new ObjectId(),       //评论用户Id
-    appSecretId : new ObjectId(),  //开发者用户Id
 }
 var tokenRequest
 
@@ -58,7 +56,7 @@ test.before('get token before', function *(t) {
 })
 
 
-test('test comment api', function * (t) {
+test.only('test comment api', function * (t) {
     
     // *  POST   /api/comments[/]        => comment.api.create()
     var res = yield testApp

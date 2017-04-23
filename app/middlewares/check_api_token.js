@@ -24,6 +24,7 @@ module.exports = function *(next) {
     try {
       var decoded = jwt.verify(token, Config.session_secret)
       this.api_user = decoded
+      this.session.appSecretId = decoded.appSecretId
       logger.debug(this.api_user)
     } catch(err) {
       logger.debug(`check_api_token err = ${err.message}`)

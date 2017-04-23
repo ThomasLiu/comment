@@ -58,16 +58,25 @@ exports.create = function *({body, getEditError, create}){
     }
 }
 
-exports.show = function *({model, id, json}){
+exports.show = function *({model, id, json, appSecretId}){
     var data = {
         success: false,
         message: 'Enjoy your data!'
-    }
+    },
+    editError
 
     var obj = yield model.findById(id)
 
     if (!obj) {
-        data.message = 'no this data'
+        editError = 'no this data'
+    }
+
+    if (!editError && `${obj.appSecretId}` !== `${appSecretId}`) {
+        editError = 'this is not your data'
+    }
+
+    if (editError) {
+        data.message = editError
         return apiFormat.api_error(data)
     } else {
         data.success = true
@@ -76,12 +85,16 @@ exports.show = function *({model, id, json}){
     }
 }
 
-exports.update = function *({body, id, getEditError, update}){
+exports.update = function *({body, id, getEditError, update, model, appSecretId}){
     var editError = getEditError(body)
 
     var data = {
         success: false,
         message: 'update success!'
+    }
+
+    if (!editError) {
+        editError = yield _checkAuth(model, appSecretId, id)
     }
 
     if (!editError) {
@@ -103,12 +116,17 @@ exports.update = function *({body, id, getEditError, update}){
     }
 }
 
-exports.destroy = function *({model, id}){
+exports.destroy = function *({model, id, appSecretId}){
     var editError
     var data = {
         success: false,
         message: 'delete success!'
     }
+
+    if (!editError) {
+        editError = yield _checkAuth(model, appSecretId, id)
+    }
+
     try {
         yield model.destroy({
                 _id: id
@@ -127,3 +145,13 @@ exports.destroy = function *({model, id}){
     }
 }
 
+var _checkAuth = function *(model, appSecretId, id){
+    var obj = yield model.findById(id),
+        isNotEq = `${obj.appSecretId}` !== `${appSecretId}`
+    logger.debug(`${obj.appSecretId} !== ${appSecretId} : ${isNotEq}`)
+    var editError
+    if (isNotEq) {
+        editError = 'this is not your data'
+    }
+    return editError
+}

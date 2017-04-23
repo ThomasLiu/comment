@@ -20,9 +20,22 @@ exports.api = {
             sort : this.query.sortby,
             limit : this.query.limit
         }
+        
+
         if (this.query.where) {
             findObj.where = JSON.parse(this.query.where)
         }
+
+        var session = this.session,
+            appSecretId = session.appSecretId
+        if (findObj.where) {
+            findObj.where.appSecretId = appSecretId
+        } else {
+            findObj.where = {
+                appSecretId : appSecretId
+            }
+        }
+
         if (this.query.attributes) {
             var array = JSON.parse(this.query.attributes)
             findObj.attributes = {}
@@ -38,8 +51,13 @@ exports.api = {
     create: function *(next){
         log(logger, '/api/reports[/] => api.create', this)
         
+        var session = this.session,
+            appSecretId = session.appSecretId,
+            body = this.request.body
+        body.appSecretId = appSecretId
+            
         this.body = yield restful.create({
-            body : this.request.body,
+            body : body,
             getEditError : _getEditError,
             create : _create
         })
@@ -47,29 +65,42 @@ exports.api = {
     show: function *(next){
         log(logger, '/api/reports/:id => api.show', this)
 
+        var session = this.session,
+            appSecretId = session.appSecretId
+
         this.body = yield restful.show({
             model: Report,
             id: this.params.id,
-            json : _json
+            json : _json,
+            appSecretId : appSecretId
         })
     },
     update: function *(next){
         log(logger, '/api/reports/:id => api.update', this)
+
+        var session = this.session,
+            appSecretId = session.appSecretId
         
         this.body = yield restful.update({
             body: this.request.body,
             id: this.params.id,
             getEditError : _getUpdateEditError,
-            update: _update
+            update: _update,
+            model: Report,
+            appSecretId : appSecretId
         })
 
     },
     destroy: function *(next){
         log(logger, '/api/reports/:id => api.destroy', this)
 
+        var session = this.session,
+            appSecretId = session.appSecretId
+
         this.body = yield restful.destroy({
             model: Report,
-            id: this.params.id
+            id: this.params.id,
+            appSecretId : appSecretId
         })
     },
 }
