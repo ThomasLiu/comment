@@ -10,17 +10,12 @@ var mock = {
     name : '1',      //评论上显示的名字
     headimgurl: '1', //评论上显示的用户头像链接
     lastIp : '1',    //最后一次登陆的IP
-
-    appSecretId : new ObjectId(),  //开发者用户Id
-
 }
 
 var mockUpdate = {
     name : '12',      //评论上显示的名字
     headimgurl: '12', //评论上显示的用户头像链接
     lastIp : '12',    //最后一次登陆的IP
-
-    appSecretId : new ObjectId(),  //开发者用户Id
 }
 var tokenRequest
 

@@ -56,7 +56,7 @@ test.before('get token before', function *(t) {
 })
 
 
-test.only('test comment api', function * (t) {
+test('test comment api', function * (t) {
     
     // *  POST   /api/comments[/]        => comment.api.create()
     var res = yield testApp

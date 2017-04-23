@@ -8,6 +8,7 @@ const restful = require('../common/restful_util')
 
 const $models = require('../common/mount-models')(__dirname)
 const Thread = $models.thread
+const User = $models.user
 
 // -- custom api
 exports.api = {
@@ -49,8 +50,28 @@ exports.api = {
         
         var session = this.session,
             appSecretId = session.appSecretId,
+            appId = session.appId,
+            appSecret = session.appSecret,
             body = this.request.body
         body.appSecretId = appSecretId
+
+        if (body.userJwt) {
+            var user = jwt.verify(body.userJwt, `${appId}|${appSecret}`)
+            if (user.key) {
+                var obj = yield User.findOne({
+                    appSecretId: appSecretId,
+                    key: user.key
+                })
+                if (!obj) {
+                    user.appSecretId = appSecretId
+                    obj = yield User.create(user)
+                } 
+                if (obj && obj._id) {
+                    body.userId = obj._id
+                }
+            }
+            delete body.userJwt
+        }
             
         this.body = yield restful.create({
             body : body,

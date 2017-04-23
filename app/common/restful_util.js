@@ -38,6 +38,7 @@ exports.create = function *({body, getEditError, create}){
         success: false,
         message: 'Enjoy your data!'
     }
+    
 
     if (!editError) {
         try {
@@ -71,8 +72,8 @@ exports.show = function *({model, id, json, appSecretId}){
         editError = 'no this data'
     }
 
-    if (!editError && `${obj.appSecretId}` !== `${appSecretId}`) {
-        editError = 'this is not your data'
+    if (!editError) {
+        editError = yield _checkAuth(obj, appSecretId)
     }
 
     if (editError) {
@@ -93,8 +94,10 @@ exports.update = function *({body, id, getEditError, update, model, appSecretId}
         message: 'update success!'
     }
 
+    var old = yield model.findById(id)
+
     if (!editError) {
-        editError = yield _checkAuth(model, appSecretId, id)
+        editError = yield _checkAuth(old, appSecretId)
     }
 
     if (!editError) {
@@ -116,15 +119,17 @@ exports.update = function *({body, id, getEditError, update, model, appSecretId}
     }
 }
 
-exports.destroy = function *({model, id, appSecretId}){
+exports.destroy = function *({model, id, appSecretId, updateCount}){
     var editError
     var data = {
         success: false,
         message: 'delete success!'
     }
 
+    var old = yield model.findById(id)
+
     if (!editError) {
-        editError = yield _checkAuth(model, appSecretId, id)
+        editError = yield _checkAuth(old, appSecretId)
     }
 
     try {
@@ -136,6 +141,10 @@ exports.destroy = function *({model, id, appSecretId}){
         editError = err.message
     }
 
+    if (!editError && updateCount) {
+        yield updateCount(old)
+    }
+
     if (editError) {
         data.message = editError
         return apiFormat.api_error(data)
@@ -145,9 +154,8 @@ exports.destroy = function *({model, id, appSecretId}){
     }
 }
 
-var _checkAuth = function *(model, appSecretId, id){
-    var obj = yield model.findById(id),
-        isNotEq = `${obj.appSecretId}` !== `${appSecretId}`
+var _checkAuth = function *(obj, appSecretId){
+    var isNotEq = `${obj.appSecretId}` !== `${appSecretId}`
     logger.debug(`${obj.appSecretId} !== ${appSecretId} : ${isNotEq}`)
     var editError
     if (isNotEq) {

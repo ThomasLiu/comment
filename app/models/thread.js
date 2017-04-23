@@ -12,6 +12,7 @@ var ThreadSchema = new Schema({
     
     ip : {type: String},
     message: {type: String},   //文章内容
+    type: {type: String},      //文章类别
 
     likes : {type: Number, default: 0}, //like 数量
     reports : {type: Number, default: 0}, //report 数量

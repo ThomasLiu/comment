@@ -8,6 +8,9 @@ const restful = require('../common/restful_util')
 
 const $models = require('../common/mount-models')(__dirname)
 const Like = $models.like
+const User = $models.user
+const Comment = $models.comment
+const Thread = $models.thread
 
 // -- custom api
 exports.api = {
@@ -49,8 +52,28 @@ exports.api = {
         
         var session = this.session,
             appSecretId = session.appSecretId,
+            appId = session.appId,
+            appSecret = session.appSecret,
             body = this.request.body
         body.appSecretId = appSecretId
+
+        if (body.userJwt) {
+            var user = jwt.verify(body.userJwt, `${appId}|${appSecret}`)
+            if (user.key) {
+                var obj = yield User.findOne({
+                    appSecretId: appSecretId,
+                    key: user.key
+                })
+                if (!obj) {
+                    user.appSecretId = appSecretId
+                    obj = yield User.create(user)
+                } 
+                if (obj && obj._id) {
+                    body.userId = obj._id
+                }
+            }
+            delete body.userJwt
+        }
             
         this.body = yield restful.create({
             body : body,
@@ -92,11 +115,12 @@ exports.api = {
 
         var session = this.session,
             appSecretId = session.appSecretId
-
+        
         this.body = yield restful.destroy({
             model: Like,
             id: this.params.id,
-            appSecretId : appSecretId
+            appSecretId : appSecretId,
+            updateCount : _updateCount
         })
     },
 }
@@ -106,7 +130,29 @@ var _update = function *(obj, id) {
 }
 
 var _create = function *(obj) {
-    return yield Like.create(obj)
+    var saved = yield Like.create(obj)
+
+    yield _updateCount(obj)
+
+    return saved
+}
+
+var _updateCount = function *(obj){
+    if (obj.commentId) {
+        var count = yield Like.count({
+            commentId : obj.commentId,
+            appSecretId : obj.appSecretId
+        })
+        yield Comment.update({ likes : count}, obj.rootId)
+    }
+
+    if (obj.threadId) {
+        var count = yield Like.count({
+            threadId : obj.threadId,
+            appSecretId : obj.appSecretId
+        })
+        yield Thread.update({ likes : count}, obj.threadId)
+    }
 }
 
 var _json = (like) => {

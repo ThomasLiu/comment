@@ -5,9 +5,12 @@ const validator = require('validator')
 const logger = require('../common/logger')(__filename.replace(__dirname, ''))
 const log = require('../common/require_logger_util')
 const restful = require('../common/restful_util')
+const jwt = require('jsonwebtoken')//用来创建和确认用户信息摘要
 
 const $models = require('../common/mount-models')(__dirname)
 const Comment = $models.comment
+const User = $models.user
+const Thread = $models.thread
 
 // -- custom api
 exports.api = {
@@ -49,8 +52,28 @@ exports.api = {
         
         var session = this.session,
             appSecretId = session.appSecretId,
+            appId = session.appId,
+            appSecret = session.appSecret,
             body = this.request.body
         body.appSecretId = appSecretId
+
+        if (body.userJwt) {
+            var user = jwt.verify(body.userJwt, `${appId}|${appSecret}`)
+            if (user.key) {
+                var obj = yield User.findOne({
+                    appSecretId: appSecretId,
+                    key: user.key
+                })
+                if (!obj) {
+                    user.appSecretId = appSecretId
+                    obj = yield User.create(user)
+                } 
+                if (obj && obj._id) {
+                    body.userId = obj._id
+                }
+            }
+            delete body.userJwt
+        }
             
         this.body = yield restful.create({
             body : body,
@@ -96,7 +119,8 @@ exports.api = {
         this.body = yield restful.destroy({
             model: Comment,
             id: this.params.id,
-            appSecretId : appSecretId
+            appSecretId : appSecretId,
+            updateCount : _updateCount
         })
     },
 }
@@ -106,7 +130,36 @@ var _update = function *(obj, id) {
 }
 
 var _create = function *(obj) {
-    return yield Comment.create(obj)
+    var saved = yield Comment.create(obj)
+
+    yield _updateCount(obj)
+    return saved
+}
+
+var _updateCount = function *(obj){
+    if (obj.parentId) {
+        var count = yield Comment.count({
+            parentId : obj.parentId,
+            appSecretId : obj.appSecretId
+        })
+        yield Comment.update({ comments : count}, obj.parentId)
+    }
+
+    if (obj.rootId) {
+        var count = yield Comment.count({
+            rootId : obj.rootId,
+            appSecretId : obj.appSecretId
+        })
+        yield Comment.update({ comments : count}, obj.rootId)
+    }
+
+    if (obj.threadId) {
+        var count = yield Comment.count({
+            threadId : obj.threadId,
+            appSecretId : obj.appSecretId
+        })
+        yield Thread.update({ comments : count}, obj.threadId)
+    }
 }
 
 var _json = (comment) => {

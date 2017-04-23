@@ -11,7 +11,6 @@ var mock = {
     commentId: new ObjectId(),  //评论Id
     threadId: new ObjectId(),    //评论实例Id
     userId: new ObjectId(),        //操作用户Id
-    appSecretId : new ObjectId(),  //开发者用户Id
 }
 
 var mockUpdate = {
@@ -19,7 +18,6 @@ var mockUpdate = {
     commentId: new ObjectId(),  //评论Id
     threadId: new ObjectId(),    //评论实例Id
     userId: new ObjectId(),        //操作用户Id
-    appSecretId : new ObjectId(),  //开发者用户Id
 }
 var tokenRequest
 

@@ -73,7 +73,6 @@ exports.api = {
                     expiresIn : 60 * 10 // 设置过期时间 10分钟
                 })
                 data.token = new_token
-                data.appSecretId = ojb._id
             } else {
                 editError = 'error appId and appSecret'
             }

@@ -16,7 +16,6 @@ var mock = {
     reposts : 4, //repost 转发数量
 
     userId: new ObjectId(),       //评论用户Id
-    appSecretId : new ObjectId(),  //开发者用户Id
 }
 
 var mockUpdate = {
@@ -29,7 +28,6 @@ var mockUpdate = {
     reposts : 41, //repost 转发数量
 
     userId: new ObjectId(),       //评论用户Id
-    appSecretId : new ObjectId(),  //开发者用户Id
 }
 var tokenRequest
 

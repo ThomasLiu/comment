@@ -6,6 +6,21 @@ class BaseModel {
         this.model = model
     }
 
+    count (where) {
+        var Model = this.model
+        return new Promise(function(resolve, reject) {
+
+            Model.count(where, function (countErr, count){
+                if (countErr) {
+                    logger.error(`findAndCountAll countErr : ${countErr}`)
+                    reject(countErr)
+                } else {
+                    resolve(count)
+                }
+            })
+        })
+    }
+
     findOne (obj) {
         var Model = this.model
         return new Promise(function(resolve, reject) {

@@ -8,9 +8,6 @@ function *gen_session(data, t) {
     var auth_token = `${data.token}$$$$`//以后可能会存储更多信息，用 $$$$ 来分嗝
 
     var session = t.session
-
-    session.appSecretId = data.appSecretId
-
     session[Config.auth_cookie_name] = auth_token
     yield t.sessionStore.set(t.sessionId,session)
 }
