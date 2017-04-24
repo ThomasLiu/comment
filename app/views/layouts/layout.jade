@@ -1,0 +1,17 @@
+include ../include/main
+
+doctype html
+html
+  head
+    title #{title || Config.name}
+
+    block head
+
+    include ./head
+
+  body
+    block content
+
+    block footer
+
+    include ./js

@@ -1,4 +1,5 @@
 var config = {
+  debug: true,
   name: 'Comment api', // 网站名名字
   description: 'Comment api', // 网站的描述
   keywords: 'Comment; api',
@@ -17,9 +18,13 @@ var config = {
 
 if (process.env.NODE_ENV === 'production') {
   config.host = 'http://comment.guideinchina.cn'
+  config.debug = false
 } else if (process.env.NODE_ENV === 'test') {
   config.host = 'http://test.comment.guideinchina.cn'
   config.port = 3100
+  config.debug = false
 }
+
+config.menus = []
 
 module.exports = config

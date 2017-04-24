@@ -5,7 +5,7 @@
  */
 
 
-const csrf = require('koa-csrf')
+const bodyparser = require('koa-better-body')
 
 // 检查用户会话
-module.exports = csrf()
+module.exports = bodyparser()

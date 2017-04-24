@@ -1,0 +1,42 @@
+
+.ellipsis(){
+    .text-overflow(ellipsis);
+    overflow: hidden;
+    white-space: nowrap;
+}
+.text-overflow(@overflow){
+    -ms-text-overflow: @overflow;
+    -o-text-overflow: @overflow;
+    text-overflow: @overflow;
+}
+.border-radius(@range){
+    -webkit-border-radius: @range;
+    -moz-border-radius: @range;
+    -ms-border-radius: @range;
+    -o-border-radius: @range;
+    border-radius: @range;
+}
+.box-sizing(@sizing){
+    -webkit-box-sizing: @sizing;
+    -moz-box-sizing: @sizing;
+    box-sizing: @sizing;
+}
+.box-shadow(@shadow){
+    -webkit-box-shadow: @shadow;
+    -moz-box-shadow: @shadow;
+    box-shadow: @shadow;
+}
+.clear(){
+    clear: both;
+    &:after{
+        clear: both;
+        content: "";
+        display: table;
+    }
+}
+.transition(@transition){
+    -webkit-transition: @transition;
+    -moz-transition: @transition;
+    -o-transition: @transition;
+    transition: @transition;
+}

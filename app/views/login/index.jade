@@ -1,0 +1,24 @@
+extends ../layouts/layout
+
+block content
+    .panel
+
+        .inner.center-block
+            .login-inner.hidden-sm.hidden-sm.hidden-xs
+            .row
+                .col-md-4
+                .col-md-8
+                    form.form-horizontal(action='/login',method='post')
+                        .form-group
+                            label.control-label.col-sm-3.col-md-3(for='appId') AppId
+                            .col-sm-9.col-md-6
+                                input#appId.form-control(type='text',name='appId')
+                        .form-group
+                            label.control-label.col-sm-3.col-md-3(for='appSecret') AppSecret
+                            .col-sm-9.col-md-6
+                                input#appSecret.form-control(type='text',name='appSecret')
+                        input(type='hidden',name='_csrf',value='#{csrf || ""}')
+
+                        .form-group
+                            .col-sm-offset-3.col-sm-9.col-md-6
+                                button.btn.btn-primary.btn-block(type="submit") Submit

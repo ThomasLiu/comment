@@ -1,4 +1,3 @@
-const bcrypt = require('bcryptjs')
 const validator = require('validator')
 var moment = require('moment')
 
@@ -52,28 +51,4 @@ exports.objArrayToIdStr = function (inputArray, fild) {
 
 
 
-
-exports.bhash = function *(str) {
-    return new Promise(function(resolve, reject) {
-        bcrypt.hash(str, 10, (err, passhash) => {
-            if (err) {
-                reject(err)
-            } else {
-                resolve(passhash)
-            }
-        })
-    })
-}
-
-exports.bcompare = function *(str, hash) {
-    return new Promise(function(resolve, reject) {
-        bcrypt.compare(str, hash, (err, bool) => {
-            if (err) {
-                reject(err)
-            } else {
-                resolve(bool)
-            }
-        })
-    })
-}
 
