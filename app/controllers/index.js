@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken')
 const validator = require('validator')
 
 const logger = require('../common/logger')(__filename.replace(__dirname, ''))
+const log = require('../common/require_logger_util')
 const apiFormat = require('../common/res_api_format')
 const tools = require('../common/tools')
 const api = require('../common/api')
@@ -12,6 +13,7 @@ const auth = require('../middlewares/auth')
 
 const $models = require('../common/mount-models')(__dirname)
 const AppSecret = $models.appSecret
+const Comment = $models.comment
 
 
 const notJump = [
@@ -22,16 +24,59 @@ const notJump = [
 ]
 
 exports.index = function *(next){
-    logger.info(`${this.method} / => index, query: ${JSON.stringify(this.query)}`)
+    log(logger, '/ => index', this)
 
-    yield this.render('index', {
-    })
+    var page = parseInt(this.query.page, 10) || 1
+    page = page > 0 ? page : 1
+    var sort = this.query.sortby || '-createdAt'
+    const limit = Config.list_count
+
+    var session = this.session,
+        appSecretId = session.appSecretId
+
+    var where = {
+            appSecretId : appSecretId
+        },
+        attributes = null,
+        result,
+        logErr
+
+    try {
+        result = yield Comment.findAndCountAll({
+            where : where,
+            offset: (page - 1) * limit,
+            limit: limit,
+            sort: sort,
+            field: attributes
+        })
+    } catch (error) {
+        logErr = error
+    }
+    
+    if (logErr){
+        yield this.render('error', {
+            message: logErr,
+            error: {status: 204, stack: 'api error' }
+        })
+    } else {
+        const all_count = result.count
+        const pages = Math.ceil(all_count / limit)
+
+        yield this.render('index', {
+            current_page: page,
+            pages: pages,
+            all_count: all_count,
+            sortby: sort,
+            list: result.rows,
+            title: 'Comment List'
+        })
+    }
     
 }
 
 
 exports.login = function *(next){
-    logger.info(`${this.method} /login => login, query: ${JSON.stringify(this.query)} , params: ${JSON.stringify(this.params)} , body: ${JSON.stringify(this.request.body)}`)
+    log(logger, '/login => login', this)
 
     const appId = validator.trim(this.request.body.appId || '').toLowerCase()
     const appSecret = validator.trim(this.request.body.appSecret || '')
@@ -84,7 +129,7 @@ exports.login = function *(next){
 // -- custom api
 exports.api = {
     index: function *(next){
-        logger.info(`${this.method} /api => api.index, query: ${JSON.stringify(this.query)}`)
+        log(logger, '/api => api.index', this)
 
         this.body = apiFormat.api({
             authorizations_url : {
@@ -110,7 +155,7 @@ exports.api = {
     },
 
     auth: function *(next){
-        logger.info(`${this.method} /api/auth => auth, query: ${JSON.stringify(this.query)} , params: ${JSON.stringify(this.params)} , body: ${JSON.stringify(this.request.body)}`)
+        log(logger, '/api/auth => auth', this)
 
         const appId = validator.trim(this.request.body.appId || '')
         const appSecret = validator.trim(this.request.body.appSecret || '')

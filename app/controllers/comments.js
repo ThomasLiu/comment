@@ -44,7 +44,23 @@ exports.api = {
             }
         }
 
-        this.body = yield restful.list(findObj)
+        var json = yield restful.list(findObj)
+
+        if (this.query.needCustomer 
+            && json.data 
+            && json.data.result
+            && json.data.result.rows) {
+            var rows = json.data.result.rows,
+                newRows = new Array()
+            for (var i in rows) {
+                var item = _json(rows[i])
+                var newItem = yield _getCustomer(item)
+                newRows.push(newItem)
+            }
+            json.data.result.rows = newRows
+        }
+
+        this.body = json
 
     },
     create: function *(next){
@@ -86,13 +102,18 @@ exports.api = {
 
         var session = this.session,
             appSecretId = session.appSecretId
-
-        this.body = yield restful.show({
+        
+        var json = yield restful.show({
             model: Comment,
             id: this.params.id,
             json : _json,
             appSecretId : appSecretId
         })
+
+        if (this.query.needCustomer) {
+            json.data.result = _getCustomer(json.data.result)
+        }
+        this.body = json
     },
     update: function *(next){
         log(logger, '/api/comments/:id => api.update', this)
@@ -123,6 +144,31 @@ exports.api = {
             updateCount : _updateCount
         })
     },
+}
+
+var _getCustomer = function *(obj) {
+    if (obj.rootId) {
+        obj.root = yield Comment.findById(obj.rootId)
+        if (obj.root && obj.root.userId ) {
+            obj.root.user = yield User.findById(obj.root.userId)
+        }
+    }
+    if (obj.parentId) {
+        obj.parent = yield Comment.findById(obj.parentId)
+        if (obj.parent && obj.parent.userId ) {
+            obj.parent.user = yield User.findById(obj.parent.userId)
+        }
+    }
+    if (obj.threadId) {
+        obj.thread = yield Thread.findById(obj.threadId)
+        if (obj.thread && obj.thread.userId ) {
+            obj.thread.user = yield User.findById(obj.thread.userId)
+        }
+    }
+    if (obj.userId) {
+        obj.user = yield User.findById(obj.userId)
+    }
+    return obj
 }
 
 var _update = function *(obj, id) {

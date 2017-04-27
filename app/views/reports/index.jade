@@ -14,8 +14,8 @@ block content
       .row.hidden-xs.hidden-sm
           each n in ['message']
             .col-md-5 #{n}
-          each n in ['status','likes', 'reports', 'comments', 'reposts', 'createdAt']
-            .sort-th.col-md-1
+          each n in ['ip','userId','createdAt']
+            .sort-th.col-md-2
                 span #{n}
                 span.page-sort
                   a(href='/?sortby=`+#{n}`'): i.glyphicon.glyphicon-chevron-up
@@ -32,7 +32,7 @@ block content
                 span.visible-xs-inline.visible-sm-inline Created At
                 span  #{item.createdAtFormat}  
             .col-md-1 
-              a.js_del_btn(data-url="/comments/#{item._id}") Remove
+              a.js_del_btn(data-url="/reports/#{item._id}") Remove
       +pagination(current_page, pages, all_count, '/positions?kw=' + (kw || '') + '&sortby=' + sortby + '&areaId=' + areaId + '&postId=' + postId + '&seniorityId=' + seniorityId + '&page=')
     else
       h2.not-data not data 

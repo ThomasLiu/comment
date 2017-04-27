@@ -42,7 +42,23 @@ exports.api = {
             }
         }
 
-        this.body = yield restful.list(findObj)
+        var json = yield restful.list(findObj)
+
+        if (this.query.needCustomer 
+            && json.data 
+            && json.data.result
+            && json.data.result.rows) {
+            var rows = json.data.result.rows,
+                newRows = new Array()
+            for (var i in rows) {
+                var item = _json(rows[i])
+                var newItem = yield _getCustomer(item)
+                newRows.push(newItem)
+            }
+            json.data.result.rows = newRows
+        }
+
+        this.body = json
 
     },
     create: function *(next){
@@ -85,12 +101,17 @@ exports.api = {
         var session = this.session,
             appSecretId = session.appSecretId
 
-        this.body = yield restful.show({
+        var json = yield restful.show({
             model: Thread,
             id: this.params.id,
             json : _json,
             appSecretId : appSecretId
         })
+
+        if (this.query.needCustomer) {
+            json.data.result = _getCustomer(json.data.result)
+        }
+        this.body = json
     },
     update: function *(next){
         log(logger, '/api/threads/:id => api.update', this)
@@ -120,6 +141,13 @@ exports.api = {
             appSecretId : appSecretId
         })
     },
+}
+
+var _getCustomer = function *(obj) {
+    if (obj.userId) {
+        obj.user = yield User.findById(obj.userId)
+    }
+    return obj
 }
 
 var _update = function *(obj, id) {

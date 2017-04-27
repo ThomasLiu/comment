@@ -44,8 +44,23 @@ exports.api = {
             }
         }
 
-        this.body = yield restful.list(findObj)
+        var json = yield restful.list(findObj)
 
+        if (this.query.needCustomer 
+            && json.data 
+            && json.data.result
+            && json.data.result.rows) {
+            var rows = json.data.result.rows,
+                newRows = new Array()
+            for (var i in rows) {
+                var item = _json(rows[i])
+                var newItem = yield _getCustomer(item)
+                newRows.push(newItem)
+            }
+            json.data.result.rows = newRows
+        }
+
+        this.body = json
     },
     create: function *(next){
         log(logger, '/api/likes[/] => api.create', this)
@@ -87,12 +102,17 @@ exports.api = {
         var session = this.session,
             appSecretId = session.appSecretId
 
-        this.body = yield restful.show({
+        var json = yield restful.show({
             model: Like,
             id: this.params.id,
             json : _json,
             appSecretId : appSecretId
         })
+
+        if (this.query.needCustomer) {
+            json.data.result = _getCustomer(json.data.result)
+        }
+        this.body = json
     },
     update: function *(next){
         log(logger, '/api/likes/:id => api.update', this)
@@ -123,6 +143,25 @@ exports.api = {
             updateCount : _updateCount
         })
     },
+}
+
+var _getCustomer = function *(obj) {
+    if (obj.commentId) {
+        obj.comment = yield Comment.findById(obj.commentId)
+        if (obj.comment && obj.comment.userId ) {
+            obj.comment.user = yield User.findById(obj.root.userId)
+        }
+    }
+    if (obj.threadId) {
+        obj.thread = yield Thread.findById(obj.threadId)
+        if (obj.thread && obj.thread.userId ) {
+            obj.thread.user = yield User.findById(obj.thread.userId)
+        }
+    }
+    if (obj.userId) {
+        obj.user = yield User.findById(obj.userId)
+    }
+    return obj
 }
 
 var _update = function *(obj, id) {
