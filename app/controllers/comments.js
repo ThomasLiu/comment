@@ -12,6 +12,8 @@ const Comment = $models.comment
 const User = $models.user
 const Thread = $models.thread
 
+const threadController = require('./threads')
+
 // -- custom api
 exports.api = {
     list: function *(next){
@@ -90,6 +92,21 @@ exports.api = {
             }
             delete body.userJwt
         }
+
+        if (body.parentId) {
+            var parent = yield Comment.findById(body.parentId)
+            if (parent) {
+                if (parent.rootId) {
+                    body.rootId = parent.rootId
+                } else {
+                    body.rootId = body.parentId
+                }
+                if (parent.threadId) {
+                    body.threadId = parent.threadId
+                }
+            }
+            
+        }
             
         this.body = yield restful.create({
             body : body,
@@ -111,8 +128,10 @@ exports.api = {
         })
 
         if (this.query.needCustomer) {
-            json.data.result = _getCustomer(json.data.result)
+            json.data.result = yield _getCustomer(json.data.result)
         }
+        
+        logger.debug(`json : ${JSON.stringify(json) }`)
         this.body = json
     },
     update: function *(next){
@@ -147,27 +166,35 @@ exports.api = {
 }
 
 var _getCustomer = function *(obj) {
+    logger.debug(`_getCustomer obj : ${JSON.stringify(obj)}`)
     if (obj.rootId) {
-        obj.root = yield Comment.findById(obj.rootId)
+        var comment = yield Comment.findById(obj.rootId)
+        obj.root = _json(comment)
         if (obj.root && obj.root.userId ) {
             obj.root.user = yield User.findById(obj.root.userId)
+            logger.debug(`_getCustomer obj.root.user : ${JSON.stringify(obj.root.user) }`)
         }
     }
     if (obj.parentId) {
-        obj.parent = yield Comment.findById(obj.parentId)
+        var comment = yield Comment.findById(obj.parentId)
+        obj.parent = _json(comment)
         if (obj.parent && obj.parent.userId ) {
             obj.parent.user = yield User.findById(obj.parent.userId)
+            logger.debug(`_getCustomer obj.parent.user : ${JSON.stringify(obj.parent.user) }`)
         }
     }
     if (obj.threadId) {
-        obj.thread = yield Thread.findById(obj.threadId)
+        var thread = yield Thread.findById(obj.threadId)
+        obj.thread = threadController._json(thread)
         if (obj.thread && obj.thread.userId ) {
             obj.thread.user = yield User.findById(obj.thread.userId)
+            logger.debug(`_getCustomer obj.thread.user : ${JSON.stringify(obj.thread.user) }`)
         }
     }
     if (obj.userId) {
         obj.user = yield User.findById(obj.userId)
     }
+    logger.debug(`_getCustomer obj : ${JSON.stringify(obj )}`)
     return obj
 }
 
@@ -232,16 +259,17 @@ var _json = (comment) => {
         updatedAtFormat: comment.updatedAtFormnpmat
     }
 }
+exports._json = _json
 
 var _getEditError = (body) => {
     const message = validator.trim(body.message || '')
     
-    const threadId = validator.trim(body.threadId || '')
-    const userId = validator.trim(body.userId || '')
+    const threadId = body.threadId || ''
+    const userId = body.userId || ''
     var editError
 
     if ([message, threadId, userId].some(function (item) { return item === ''})) {
-        editError = 'We need your message, threadId and userId'
+        editError = 'We need your message, threadId and userJwt'
     }
     return editError
 }

@@ -11,6 +11,7 @@ var ObjectId  = Schema.ObjectId
 var ThreadSchema = new Schema({
     
     ip : {type: String},
+    title : {type: String},    //文章标题
     message: {type: String},   //文章内容
     type: {type: String},      //文章类别
 

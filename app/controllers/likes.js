@@ -1,6 +1,7 @@
 "use strict"
 
 const validator = require('validator')
+const jwt = require('jsonwebtoken')
 
 const logger = require('../common/logger')(__filename.replace(__dirname, ''))
 const log = require('../common/require_logger_util')
@@ -11,6 +12,9 @@ const Like = $models.like
 const User = $models.user
 const Comment = $models.comment
 const Thread = $models.thread
+
+const threadController = require('./threads')
+const commentController = require('./comments')
 
 // -- custom api
 exports.api = {
@@ -110,7 +114,7 @@ exports.api = {
         })
 
         if (this.query.needCustomer) {
-            json.data.result = _getCustomer(json.data.result)
+            json.data.result = yield _getCustomer(json.data.result)
         }
         this.body = json
     },
@@ -147,13 +151,15 @@ exports.api = {
 
 var _getCustomer = function *(obj) {
     if (obj.commentId) {
-        obj.comment = yield Comment.findById(obj.commentId)
+        var comment = yield Comment.findById(obj.commentId)
+        obj.comment = commentController._json(comment)
         if (obj.comment && obj.comment.userId ) {
-            obj.comment.user = yield User.findById(obj.root.userId)
+            obj.comment.user = yield User.findById(obj.comment.userId)
         }
     }
     if (obj.threadId) {
-        obj.thread = yield Thread.findById(obj.threadId)
+        var thread = yield Thread.findById(obj.threadId)
+        obj.thread = threadController._json(thread)
         if (obj.thread && obj.thread.userId ) {
             obj.thread.user = yield User.findById(obj.thread.userId)
         }
@@ -182,7 +188,7 @@ var _updateCount = function *(obj){
             commentId : obj.commentId,
             appSecretId : obj.appSecretId
         })
-        yield Comment.update({ likes : count}, obj.rootId)
+        yield Comment.update({ likes : count}, obj.commentId)
     }
 
     if (obj.threadId) {
@@ -211,14 +217,14 @@ var _json = (like) => {
 }
 
 var _getEditError = (body) => {
-    const userId = validator.trim(body.userId || '')
+    const userId = body.userId || ''
     
     const commentId = validator.trim(body.commentId || '')
     const threadId = validator.trim(body.threadId || '')
     var editError
 
     if ([userId].some(function (item) { return item === ''})) {
-        editError = 'We need your userId'
+        editError = 'We need your userJwt'
     } else if (!(commentId || threadId)){
         editError = 'We need your threadId or commentId'
     }

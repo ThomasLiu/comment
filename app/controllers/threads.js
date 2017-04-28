@@ -1,6 +1,7 @@
 "use strict"
 
 const validator = require('validator')
+const jwt = require('jsonwebtoken')
 
 const logger = require('../common/logger')(__filename.replace(__dirname, ''))
 const log = require('../common/require_logger_util')
@@ -41,9 +42,9 @@ exports.api = {
                 attributes[item] = 1
             }
         }
-
+        logger.debug(`1 ---------`)
         var json = yield restful.list(findObj)
-
+        logger.debug(`2 ---------`)
         if (this.query.needCustomer 
             && json.data 
             && json.data.result
@@ -109,7 +110,7 @@ exports.api = {
         })
 
         if (this.query.needCustomer) {
-            json.data.result = _getCustomer(json.data.result)
+            json.data.result = yield _getCustomer(json.data.result)
         }
         this.body = json
     },
@@ -163,7 +164,9 @@ var _json = (thread) => {
         id : thread._id,
 
         ip : thread.ip,
+        title : thread.title,
         message : thread.message,
+        type : thread.type,
 
         likes : thread.likes,
         reports : thread.reports,
@@ -178,9 +181,26 @@ var _json = (thread) => {
         updatedAtFormat: thread.updatedAtFormnpmat
     }
 }
+exports._json = _json
 
 var _getEditError = (body) => {
     var editError
+    const message = validator.trim(body.message || '')
+    
+    const title = validator.trim(body.title || '')
+    const type = validator.trim(body.type || '')
+    const userId = body.userId || ''
+    var editError
+    
+    logger.debug(`message : ${message}`)
+    logger.debug(`title : ${title}`)
+    logger.debug(`type : ${type}`)
+    logger.debug(`userId : ${userId}`)
+    
+
+    if ([message, title, type, userId].some(function (item) { return item === ''})) {
+        editError = 'We need your message, title, type and userJwt'
+    }
     return editError
 }
 

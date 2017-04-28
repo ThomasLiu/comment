@@ -8,9 +8,9 @@ exports.list = function *({model, where, page, sort, limit = Config.list_count, 
     page = page > 0 ? page : 1
     limit = parseInt(limit)
 
-    if (sort) {
-        sort = JSON.parse(sort)
-    }
+    // if (sort) {
+    //     sort = JSON.parse(sort)
+    // }
 
     var data = {
         success: false,
