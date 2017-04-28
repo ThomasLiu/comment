@@ -225,7 +225,7 @@ var res = yield testApp
 }
 ```
 
-详细例子可以看测试用例 /test/app/routes/api/comments.js
+详细例子可以看测试用例 /test/app/routes/api/comments.js <br>
 需求列表所有测试用例 /test/app/routes/api/test.js
 
 
