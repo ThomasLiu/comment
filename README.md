@@ -63,12 +63,16 @@ PATCH  /api/comments/:id       => comments.api.update()<br>
 DELETE /api/comments/:id       => comments.api.destroy()<br>
 
 ##### GET    /api/comments[/]
-###### 参数
-**page** *int* 选填 获取列表的第几页， 默认值为 1<br>
-**limit** *int* 选填 一页中获取多小个对象， 默认值为 /config/sys.js 的list_count<br>
-**sort** *string* 选填 按照怎样的规则排序，参数规则按mongoose的sort规则，将对例 JSON.stringify({createdAt: -1})， 默认值为 '{"createdAt": -1}'<br>
-**where** *string* 选填 按照怎样的规则搜索，参数规则按mongoose的find()的参数规则，例 JSON.stringify({attribute1: 'a'})，没有参数是搜索全部 ，没有默认值<br>
-**attributes** *string* 选填 返回的列表对象中的字段，例 JSON.stringify(['attribute1','attribute2','attribute3'])，没有参数时显示全部字段 ，没有默认值<br>
+
+| 参数           | 类型      | 必填  | 默认值                        | 说明                                                                                    |
+| ------------- |:---------:|:----:| :--------------------------: | --------------------------------------------------------------------------------------:|
+| page          | int       | 否   | 1                            | 获取列表的第几页                                                                          |
+| limit         | int       | 否   | /config/sys.js 的list_count   | 一页中获取多小个对象                                                                      |
+| sort          | string    | 否   | '{"createdAt": -1}'          | 按照怎样的规则排序，参数规则按mongoose的sort规则，将对例 JSON.stringify({createdAt: -1})       |
+| where         | string    | 否   | 没有默认值，默认搜索全部         | 按照怎样的规则搜索，参数规则按mongoose的find()的参数规则，例 JSON.stringify({attribute1: 'a'}) |
+| attributes    | string    | 否   | 没有默认值，默认显示全部         | 返回的列表对象中的字段，例 JSON.stringify(['attribute1','attribute2','attribute3'])         |
+| needCustomer  | int       | 否   | 0                            | 返回对象是否包含关联对象，如userId，当该参数值为1时，对象中就会有user属性，装上userId对应的对象      |
+
 ###### 返回json
 ```
 {
@@ -221,6 +225,8 @@ updateAt: { type: Date, default: Date.now },
 ```
 //Report
 ip : {type: String},
+message: {type: String},   //评论内容
+
 commentId: { type: ObjectId , ref: 'Comment' },  //评论Id
 threadId: { type: ObjectId , ref: 'Thread' },    //评论实例Id
 userId: { type: ObjectId , ref: 'User' },        //操作用户Id
@@ -234,7 +240,9 @@ updateAt: { type: Date, default: Date.now },
 ```
 //Thread 
 ip : {type: String},
+title : {type: String},    //文章标题
 message: {type: String},   //文章内容
+type: {type: String},      //文章类别
 
 likes : {type: Number, default: 0}, //like 数量
 reports : {type: Number, default: 0}, //report 数量
