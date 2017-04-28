@@ -65,12 +65,12 @@ DELETE /api/comments/:id       => comments.api.destroy()<br>
 ##### GET    /api/comments[/]
 
 | 参数           | 类型      | 必填  | 默认值                        | 说明                                                                                    |
-| ------------- |:---------:|:----:| :--------------------------: | --------------------------------------------------------------------------------------:|
+| ------------- |:---------:|:----:| :--------------------------  | :--------------------------------------------------------------------------------------|
 | page          | int       | 否   | 1                            | 获取列表的第几页                                                                          |
 | limit         | int       | 否   | /config/sys.js 的list_count   | 一页中获取多小个对象                                                                      |
-| sort          | string    | 否   | '{"createdAt": -1}'          | 按照怎样的规则排序，参数规则按mongoose的sort规则，将对例 JSON.stringify({createdAt: -1})       |
-| where         | string    | 否   | 没有默认值，默认搜索全部         | 按照怎样的规则搜索，参数规则按mongoose的find()的参数规则，例 JSON.stringify({attribute1: 'a'}) |
-| attributes    | string    | 否   | 没有默认值，默认显示全部         | 返回的列表对象中的字段，例 JSON.stringify(['attribute1','attribute2','attribute3'])         |
+| sort          | string    | 否   | '-createdAt'                 | 按照怎样的规则排序，参数规则按mongoose的sort规则，将对例 JSON.stringify({createdAt: -1})       |
+| where         | string    | 否   | 默认搜索全部                   | 按照怎样的规则搜索，参数规则按mongoose的find()的参数规则，例 JSON.stringify({attribute1: 'a'}) |
+| attributes    | string    | 否   | 默认显示全部                   | 返回的列表对象中的字段，例 JSON.stringify(['attribute1','attribute2','attribute3'])         |
 | needCustomer  | int       | 否   | 0                            | 返回对象是否包含关联对象，如userId，当该参数值为1时，对象中就会有user属性，装上userId对应的对象      |
 
 ###### 返回json
@@ -95,8 +95,10 @@ DELETE /api/comments/:id       => comments.api.destroy()<br>
 ```
 
 ##### GET    /api/comments/:id
-###### 参数
-**id** *ObjectId* 必填 需要获取对象的id<br>
+| 参数           | 类型      | 必填  | 默认值                        | 说明                                                                                    |
+| ------------- |:---------:|:----:| :--------------------------  | :--------------------------------------------------------------------------------------|
+| id            | ObjectId  | 是   |                              | 需要获取对象的id                                                                          |
+| needCustomer  | int       | 否   | 0                            | 返回对象是否包含关联对象，如userId，当该参数值为1时，对象中就会有user属性，装上userId对应的对象      |
 
 ###### 返回json
 ```
@@ -116,7 +118,28 @@ DELETE /api/comments/:id       => comments.api.destroy()<br>
 
 ##### POST   /api/comments[/]
 ###### 参数
-将需要保存的对象属性作为参数 post
+| 参数           | 类型      | 必填  | 默认值                        | 说明                                                                                    |
+| ------------- |:---------:|:----:| :--------------------------  | :--------------------------------------------------------------------------------------|
+| message       | string    | 是   | 无                           | 评论内容，可包含html结构                                                                   |
+| threadId      | ObjectId  | 是   | 无                           | 评论实例Id                                                                               |
+| parentId      | ObjectId  | 否   | 无                           | 回复评论Id                                                                               |
+| userJwt       | string    | 是   | 无                           | 评论者Jwt加密                                                                            |
+
+```
+//userJwt 生成代码样例
+import jwt from 'jsonwebtoken'
+
+var secret = `${yourAppId}|${yourAppSecret}`
+var user = {
+    name: 'Thomas Lau',
+    headimgurl: 'http://image.hiredchina.com/FqaRXhs-501g_Bv0pKAByc91TgqD?imageMogr2/interlace/1',
+    lastIp: '192.168.1.1',
+    key: '111111'    //自己系统上的ID，用来区分唯一性
+}
+var userJwt = jwt.sign(user, secret, {
+    expiresIn : 60 * 10 // 设置过期时间 10分钟
+})
+```
 
 ###### 返回json
 ```
@@ -138,8 +161,28 @@ DELETE /api/comments/:id       => comments.api.destroy()<br>
 
 ##### PATCH  /api/comments/:id
 ###### 参数
-**id** *ObjectId* 必填 需要更新对象的id<br>
+| 参数           | 类型      | 必填  | 默认值                        | 说明                                                                                    |
+| ------------- |:---------:|:----:| :--------------------------  | :--------------------------------------------------------------------------------------|
+| id            | ObjectId  | 是   |                              | 需要更新对象的id                                                                          |
 将需要更新的对象属性作为参数 post
+
+```
+//代码样例
+var res = yield testApp
+    .post('/api/auth')
+    .send({
+        'appId': yourAppId,
+        'appSecret': yourAppSecret
+    })
+var json = res.body.data     
+
+var res = yield testApp
+    .patch(`/api/comments/${id}`)
+    .send({
+        message : 'update message'
+    })
+    .set('x-access-token',json.token)
+```
 
 ###### 返回json
 ```
@@ -163,7 +206,9 @@ DELETE /api/comments/:id       => comments.api.destroy()<br>
 
 ##### DELETE /api/comments/:id 
 ###### 参数
-**id** *ObjectId* 必填 需要删除对象的id<br>
+| 参数           | 类型      | 必填  | 默认值                        | 说明                                                                                    |
+| ------------- |:---------:|:----:| :--------------------------  | :--------------------------------------------------------------------------------------|
+| id            | ObjectId  | 是   |                              | 需要删除对象的id                                                                          |
 
 ###### 返回json
 ```
@@ -181,8 +226,7 @@ DELETE /api/comments/:id       => comments.api.destroy()<br>
 ```
 
 详细例子可以看测试用例 /test/app/routes/api/comments.js
-
-
+需求列表所有测试用例 /test/app/routes/api/test.js
 
 
 #### Models
@@ -262,6 +306,7 @@ updateAt: { type: Date, default: Date.now },
 name : {type: String},      //评论上显示的名字
 headimgurl: {type: String}, //评论上显示的用户头像链接
 lastIp : {type: String},    //最后一次登陆的IP
+key: {type: String},        //自己系统上的ID，用来区分唯一性
 
 appSecretId : { type: ObjectId , ref: 'AppSecret' },  //开发者用户Id
 
