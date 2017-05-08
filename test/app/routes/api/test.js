@@ -613,100 +613,100 @@ test.only('test all', function * (t) {
 
 
 
-    //取消文章点赞
-    res = yield testApp
-            .del(`/api/likes/${likeThreadId}`)
-            .set('x-access-token',tokenRequest)
+    // //取消文章点赞
+    // res = yield testApp
+    //         .del(`/api/likes/${likeThreadId}`)
+    //         .set('x-access-token',tokenRequest)
 
-    t.is(200, res.status) 
-    //检查文章1点赞数
-    res = yield testApp
-                .get(`/api/threads/${thread1Id}`)
-                .set('x-access-token',tokenRequest)
+    // t.is(200, res.status) 
+    // //检查文章1点赞数
+    // res = yield testApp
+    //             .get(`/api/threads/${thread1Id}`)
+    //             .set('x-access-token',tokenRequest)
 
-    json = res.body.data 
-    t.is(200, res.status)
-    t.is(3, json.result.comments)
-    t.is(0, json.result.likes)
-    t.is(1, json.result.reports)
-    t.is(0, json.result.reposts)
+    // json = res.body.data 
+    // t.is(200, res.status)
+    // t.is(3, json.result.comments)
+    // t.is(0, json.result.likes)
+    // t.is(1, json.result.reports)
+    // t.is(0, json.result.reposts)
 
-    //取消评论点赞
-    res = yield testApp
-            .del(`/api/likes/${likeCommentId}`)
-            .set('x-access-token',tokenRequest)
+    // //取消评论点赞
+    // res = yield testApp
+    //         .del(`/api/likes/${likeCommentId}`)
+    //         .set('x-access-token',tokenRequest)
 
-    t.is(200, res.status) 
-    //检查评论2点赞数
-    res = yield testApp
-                .get(`/api/comments/${comment2Id}`)
-                .set('x-access-token',tokenRequest)
+    // t.is(200, res.status) 
+    // //检查评论2点赞数
+    // res = yield testApp
+    //             .get(`/api/comments/${comment2Id}`)
+    //             .set('x-access-token',tokenRequest)
 
-    json = res.body.data 
-    t.is(200, res.status)
-    t.is(1, json.result.comments)
-    t.is(0, json.result.likes)
-    t.is(0, json.result.reports)
-    t.is(0, json.result.reposts)
+    // json = res.body.data 
+    // t.is(200, res.status)
+    // t.is(1, json.result.comments)
+    // t.is(0, json.result.likes)
+    // t.is(0, json.result.reports)
+    // t.is(0, json.result.reposts)
 
-    //取消文章举报
-    res = yield testApp
-            .del(`/api/reports/${reportThreadId}`)
-            .set('x-access-token',tokenRequest)
+    // //取消文章举报
+    // res = yield testApp
+    //         .del(`/api/reports/${reportThreadId}`)
+    //         .set('x-access-token',tokenRequest)
 
-    t.is(200, res.status) 
-    //检查文章1举报数
-    res = yield testApp
-                .get(`/api/threads/${thread1Id}`)
-                .set('x-access-token',tokenRequest)
+    // t.is(200, res.status) 
+    // //检查文章1举报数
+    // res = yield testApp
+    //             .get(`/api/threads/${thread1Id}`)
+    //             .set('x-access-token',tokenRequest)
 
-    json = res.body.data 
-    t.is(200, res.status)
-    t.is(3, json.result.comments)
-    t.is(0, json.result.likes)
-    t.is(0, json.result.reports)
-    t.is(0, json.result.reposts)
+    // json = res.body.data 
+    // t.is(200, res.status)
+    // t.is(3, json.result.comments)
+    // t.is(0, json.result.likes)
+    // t.is(0, json.result.reports)
+    // t.is(0, json.result.reposts)
 
-    //取消评论举报
-    res = yield testApp
-            .del(`/api/reports/${reportCommentId}`)
-            .set('x-access-token',tokenRequest)
+    // //取消评论举报
+    // res = yield testApp
+    //         .del(`/api/reports/${reportCommentId}`)
+    //         .set('x-access-token',tokenRequest)
 
-    t.is(200, res.status) 
-    //检查评论3点举报
-    res = yield testApp
-                .get(`/api/comments/${comment3Id}`)
-                .set('x-access-token',tokenRequest)
+    // t.is(200, res.status) 
+    // //检查评论3点举报
+    // res = yield testApp
+    //             .get(`/api/comments/${comment3Id}`)
+    //             .set('x-access-token',tokenRequest)
 
-    json = res.body.data 
-    t.is(200, res.status)
-    t.is(0, json.result.comments)
-    t.is(0, json.result.likes)
-    t.is(0, json.result.reports)
-    t.is(0, json.result.reposts)
+    // json = res.body.data 
+    // t.is(200, res.status)
+    // t.is(0, json.result.comments)
+    // t.is(0, json.result.likes)
+    // t.is(0, json.result.reports)
+    // t.is(0, json.result.reposts)
 
 
-    res = yield testApp
-            .del(`/api/comments/${comment1Id}`)
-            .set('x-access-token',tokenRequest)
-    res = yield testApp
-            .del(`/api/comments/${comment2Id}`)
-            .set('x-access-token',tokenRequest)
-    res = yield testApp
-            .del(`/api/comments/${comment3Id}`)
-            .set('x-access-token',tokenRequest)
-    res = yield testApp
-            .del(`/api/threads/${thread1Id}`)
-            .set('x-access-token',tokenRequest)
-    res = yield testApp
-            .del(`/api/threads/${thread2Id}`)
-            .set('x-access-token',tokenRequest)
-    res = yield testApp
-            .del(`/api/users/${user1Id}`)
-            .set('x-access-token',tokenRequest)
-    res = yield testApp
-            .del(`/api/users/${user2Id}`)
-            .set('x-access-token',tokenRequest)
+    // res = yield testApp
+    //         .del(`/api/comments/${comment1Id}`)
+    //         .set('x-access-token',tokenRequest)
+    // res = yield testApp
+    //         .del(`/api/comments/${comment2Id}`)
+    //         .set('x-access-token',tokenRequest)
+    // res = yield testApp
+    //         .del(`/api/comments/${comment3Id}`)
+    //         .set('x-access-token',tokenRequest)
+    // res = yield testApp
+    //         .del(`/api/threads/${thread1Id}`)
+    //         .set('x-access-token',tokenRequest)
+    // res = yield testApp
+    //         .del(`/api/threads/${thread2Id}`)
+    //         .set('x-access-token',tokenRequest)
+    // res = yield testApp
+    //         .del(`/api/users/${user1Id}`)
+    //         .set('x-access-token',tokenRequest)
+    // res = yield testApp
+    //         .del(`/api/users/${user2Id}`)
+    //         .set('x-access-token',tokenRequest)
 
 
 })

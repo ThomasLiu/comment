@@ -15,7 +15,7 @@ var $ = require('../common/mount-controllers')(__dirname).reports
  *
  */
 
-router.get('/:fled/:id' ,$middlewares.auth.userRequired, $.index)
+router.get('/' ,$middlewares.auth.userRequired, $.index)
 
 
 module.exports = router

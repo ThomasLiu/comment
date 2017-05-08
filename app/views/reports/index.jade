@@ -1,4 +1,4 @@
-extends layouts/layout
+extends ../layouts/layout
 
 block content
   +menu(Config.menus)
@@ -7,33 +7,54 @@ block content
       span #{title}
     h4.visible-sm-block.visible-xs-block
       span #{title}
-
-    hr
     if (list && list.length > 0)             
       hr.hidden-xs.hidden-sm
       .row.hidden-xs.hidden-sm
           each n in ['message']
             .col-md-5 #{n}
-          each n in ['ip','userId','createdAt']
+          each n in ['createdAt']
             .sort-th.col-md-2
                 span #{n}
                 span.page-sort
-                  a(href='/?sortby=`+#{n}`'): i.glyphicon.glyphicon-chevron-up
-                  a(href='/?sortby=`-#{n}`'): i.glyphicon.glyphicon-chevron-down  
+                  a(href='/?fled=#{fled}&id=#{id}&sortby=+#{n}'): i.glyphicon.glyphicon-chevron-up
+                  a(href='/?fled=#{fled}&id=#{id}&sortby=-#{n}'): i.glyphicon.glyphicon-chevron-down  
           .col-md-1  
       each item in list
         hr
         .row
             .col-md-5
-              p !{item.message}
-            each n in ['item.status','item.likes','item.reports','item.comments','item.reposts','item.createAtFormat']    
+              if (item.user)
+                .media
+                  .media-left
+                    a 
+                      img.media-object(src="#{item.user.headimgurl}")
+                  .media-body
+                    h4.media-heading #{item.user.name}
+                    p !{item.message}
+                    if (item.comment) 
+                      p 
+                        span 来自评论 !{item.comment.message}
+                        if (item.comment.user) 
+                          span -- #{item.comment.user.name} 的举报
+                    if (item.thread) 
+                      p 来自实体 #{item.thread.title} 的举报
+              else 
+                p !{item.message}
+                if (item.comment) 
+                  p 
+                    span 来自评论 !{item.comment.message}
+                    if (item.comment.user) 
+                      span -- #{item.comment.user.name} 的举报
+                if (item.thread) 
+                  p 来自实体 #{item.thread.title} 的举报
+            each n in ['item.createAtFormat']    
               - name = n.split('.')[1].replace('Format','');
               .col-md-1 
                 span.visible-xs-inline.visible-sm-inline Created At
                 span  #{item.createdAtFormat}  
             .col-md-1 
               a.js_del_btn(data-url="/reports/#{item._id}") Remove
-      +pagination(current_page, pages, all_count, '/positions?kw=' + (kw || '') + '&sortby=' + sortby + '&areaId=' + areaId + '&postId=' + postId + '&seniorityId=' + seniorityId + '&page=')
+      +pagination(current_page, pages, all_count, '/reports?sortby=' + sortby + '&fled=' + fled + '&id=' + id + '&page=')
     else
       h2.not-data not data 
    

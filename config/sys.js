@@ -25,6 +25,8 @@ if (process.env.NODE_ENV === 'production') {
   config.debug = false
 }
 
-config.menus = []
+config.menus = [
+  {name: 'Reports', href: '/reports'}
+]
 
 module.exports = config

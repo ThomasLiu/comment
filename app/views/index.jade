@@ -8,7 +8,6 @@ block content
     h4.visible-sm-block.visible-xs-block
       span #{title}
 
-    hr
     if (list && list.length > 0)             
       hr.hidden-xs.hidden-sm
       .row.hidden-xs.hidden-sm
@@ -18,22 +17,45 @@ block content
             .sort-th.col-md-1
                 span #{n}
                 span.page-sort
-                  a(href='/?sortby=`+#{n}`'): i.glyphicon.glyphicon-chevron-up
-                  a(href='/?sortby=`-#{n}`'): i.glyphicon.glyphicon-chevron-down  
+                  a(href='/?sortby=+#{n}'): i.glyphicon.glyphicon-chevron-up
+                  a(href='/?sortby=-#{n}'): i.glyphicon.glyphicon-chevron-down  
           .col-md-1  
       each item in list
         hr
         .row
             .col-md-5
-              p !{item.message}
-            each n in ['item.status','item.likes','item.reports','item.comments','item.reposts','item.createAtFormat']    
+              if (item.user)
+                .media
+                  .media-left
+                    a 
+                      img.media-object(src="#{item.user.headimgurl}")
+                  .media-body
+                    h4.media-heading #{item.user.name}
+                    p !{item.message}
+                    if (item.parent) 
+                      p 
+                        span 回复 !{item.parent.message}
+                        if (item.parent.user) 
+                          span -- #{item.parent.user.name}
+                    if (item.thread) 
+                      p 来自 #{item.thread.title} 的评论
+              else 
+                p !{item.message}
+                if (item.parent) 
+                  p 
+                    span 回复 !{item.parent.message}
+                    if (item.parent.user) 
+                      span -- #{item.parent.user.name}
+                if (item.thread) 
+                  p 来自 #{item.thread.title} 的评论
+            each n in ['item.status','item.likes','item.reports','item.comments','item.reposts','item.createdAtFormat']    
               - name = n.split('.')[1].replace('Format','');
               .col-md-1 
-                span.visible-xs-inline.visible-sm-inline Created At
-                span  #{item.createdAtFormat}  
+                span.visible-xs-inline.visible-sm-inline name
+                span  #{eval(n)}  
             .col-md-1 
-              a.js_del_btn(data-url="/comments/#{item._id}") Remove
-      +pagination(current_page, pages, all_count, '/positions?kw=' + (kw || '') + '&sortby=' + sortby + '&areaId=' + areaId + '&postId=' + postId + '&seniorityId=' + seniorityId + '&page=')
+              a.js_del_btn(data-url="/comments/#{item.id}") Remove
+      +pagination(current_page, pages, all_count, '/?sortby=' + sortby + '&page=')
     else
       h2.not-data not data 
    

@@ -152,17 +152,23 @@ exports.api = {
 var _getCustomer = function *(obj) {
     if (obj.commentId) {
         var comment = yield Comment.findById(obj.commentId)
-        obj.comment = commentController._json(comment)
-        if (obj.comment && obj.comment.userId ) {
-            obj.comment.user = yield User.findById(obj.comment.userId)
+        if (comment) {
+            obj.comment = commentController._json(comment)
+            if (obj.comment && obj.comment.userId ) {
+                obj.comment.user = yield User.findById(obj.comment.userId)
+            }
         }
+        
     }
     if (obj.threadId) {
         var thread = yield Thread.findById(obj.threadId)
-        obj.thread = threadController._json(thread)
-        if (obj.thread && obj.thread.userId ) {
-            obj.thread.user = yield User.findById(obj.thread.userId)
+        if (thread) {
+            obj.thread = threadController._json(thread)
+            if (obj.thread && obj.thread.userId ) {
+                obj.thread.user = yield User.findById(obj.thread.userId)
+            }
         }
+        
     }
     if (obj.userId) {
         obj.user = yield User.findById(obj.userId)
@@ -209,10 +215,10 @@ var _json = (like) => {
         threadId : like.threadId,
         userId : like.userId,
 
-        create_at : like.create_at,
-        update_at : like.update_at,
-        createdAtFormat: like.createdAtFormat,
-        updatedAtFormat: like.updatedAtFormnpmat
+        createAt : like.createAt,
+        updateAt : like.updateAt,
+        createdAtFormat: like.createdAtFormat(),
+        updatedAtFormat: like.updatedAtFormnpmat()
     }
 }
 

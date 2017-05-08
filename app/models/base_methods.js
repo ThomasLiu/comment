@@ -6,11 +6,11 @@ var tools = require('../common/tools')
 
 module.exports = function (schema) {
     schema.methods.createdAtFormat = function () {
-        return tools.formatDate(this.createAt)
+        return tools.formatDate({date: this.createAt})
     }
 
     schema.methods.updatedAtFormnpmat = function () {
-        return tools.formatDate(this.updateAt)
+        return tools.formatDate({date: this.updateAt})
     }
     
 }

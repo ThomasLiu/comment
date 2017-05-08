@@ -166,37 +166,45 @@ exports.api = {
 }
 
 var _getCustomer = function *(obj) {
-    logger.debug(`_getCustomer obj : ${JSON.stringify(obj)}`)
+    logger.debug(`_getCustomer before obj : ${JSON.stringify(obj)}`)
     if (obj.rootId) {
         var comment = yield Comment.findById(obj.rootId)
-        obj.root = _json(comment)
-        if (obj.root && obj.root.userId ) {
-            obj.root.user = yield User.findById(obj.root.userId)
-            logger.debug(`_getCustomer obj.root.user : ${JSON.stringify(obj.root.user) }`)
+        if (comment) {
+            obj.root = _json(comment)
+            if (obj.root && obj.root.userId ) {
+                obj.root.user = yield User.findById(obj.root.userId)
+                logger.debug(`_getCustomer obj.root.user : ${JSON.stringify(obj.root.user) }`)
+            }
         }
     }
     if (obj.parentId) {
         var comment = yield Comment.findById(obj.parentId)
-        obj.parent = _json(comment)
-        if (obj.parent && obj.parent.userId ) {
-            obj.parent.user = yield User.findById(obj.parent.userId)
-            logger.debug(`_getCustomer obj.parent.user : ${JSON.stringify(obj.parent.user) }`)
+        if (comment) {
+            obj.parent = _json(comment)
+            if (obj.parent && obj.parent.userId ) {
+                obj.parent.user = yield User.findById(obj.parent.userId)
+                logger.debug(`_getCustomer obj.parent.user : ${JSON.stringify(obj.parent.user) }`)
+            }
         }
     }
     if (obj.threadId) {
         var thread = yield Thread.findById(obj.threadId)
-        obj.thread = threadController._json(thread)
-        if (obj.thread && obj.thread.userId ) {
-            obj.thread.user = yield User.findById(obj.thread.userId)
-            logger.debug(`_getCustomer obj.thread.user : ${JSON.stringify(obj.thread.user) }`)
+        if (thread) {
+            obj.thread = threadController._json(thread)
+            if (obj.thread && obj.thread.userId ) {
+                obj.thread.user = yield User.findById(obj.thread.userId)
+                logger.debug(`_getCustomer obj.thread.user : ${JSON.stringify(obj.thread.user) }`)
+            }
         }
+        
     }
     if (obj.userId) {
         obj.user = yield User.findById(obj.userId)
     }
-    logger.debug(`_getCustomer obj : ${JSON.stringify(obj )}`)
+    logger.debug(`_getCustomer after obj : ${JSON.stringify(obj )}`)
     return obj
 }
+exports._getCustomer = _getCustomer
 
 var _update = function *(obj, id) {
     return yield Comment.update(obj,id)
@@ -253,10 +261,10 @@ var _json = (comment) => {
         threadId : comment.threadId,
         userId : comment.userId,
 
-        create_at : comment.create_at,
-        update_at : comment.update_at,
-        createdAtFormat: comment.createdAtFormat,
-        updatedAtFormat: comment.updatedAtFormnpmat
+        createAt : comment.createAt,
+        updateAt : comment.updateAt,
+        createdAtFormat: comment.createdAtFormat(),
+        updatedAtFormat: comment.updatedAtFormnpmat()
     }
 }
 exports._json = _json

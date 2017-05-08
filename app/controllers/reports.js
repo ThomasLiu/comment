@@ -18,7 +18,7 @@ const commentController = require('./comments')
 
 
 exports.index = function *(next){
-    log(logger, '/:fled/:id => index', this)
+    log(logger, '/ => index', this)
 
     var page = parseInt(this.query.page, 10) || 1
     page = page > 0 ? page : 1
@@ -27,27 +27,49 @@ exports.index = function *(next){
 
     var session = this.session,
         appSecretId = session.appSecretId,
-        id = this.params.id,
-        fled = this.params.fled,
+        id = this.query.id || '',
+        fled = this.query.fled || '',
         where = {
             appSecretId : appSecretId
         },
         attributes = null,
         result,
-        logErr
+        logErr,
+        data = {
+            current_page: page,
+            sortby: sort,
+            fled: fled,
+            id: id,
+            title: 'Report List'
+        }
     
     if (fled && id) {
         where[fled] = id
     }
 
     try {
-        result = yield Comment.findAndCountAll({
+        result = yield Report.findAndCountAll({
             where : where,
             offset: (page - 1) * limit,
             limit: limit,
             sort: sort,
             field: attributes
         })
+        const all_count = result.count
+        data.pages = Math.ceil(all_count / limit)
+        data.all_count = all_count
+        if (result.rows && result.rows.length > 0) {
+            var rows = result.rows,
+                newRows = new Array()
+            for (var i in rows) {
+                if(rows[i]) {
+                    var item = _json(rows[i])
+                    var newItem = yield _getCustomer(item)
+                    newRows.push(newItem)
+                }
+            }
+            data.list = newRows
+        }
     } catch (error) {
         logErr = error
     }
@@ -61,16 +83,7 @@ exports.index = function *(next){
         const all_count = result.count
         const pages = Math.ceil(all_count / limit)
 
-        yield this.render('reports/index', {
-            current_page: page,
-            pages: pages,
-            all_count: all_count,
-            sortby: sort,
-            list: result.rows,
-            fled: fled,
-            id: id,
-            title: `Reports List`
-        })
+        yield this.render('reports/index', data)
     }
 }
 
@@ -218,18 +231,21 @@ var _getCustomer = function *(obj) {
     logger.debug(`_getCustomer : ${JSON.stringify(obj)}`)
     if (obj.commentId) {
         var comment = yield Comment.findById(obj.commentId)
-        obj.comment = commentController._json(comment)
-        if (obj.comment && obj.comment.userId ) {
-            obj.comment.user = yield User.findById(obj.comment.userId)
+        if (comment) {
+            obj.comment = commentController._json(comment)
+            if (obj.comment && obj.comment.userId ) {
+                obj.comment.user = yield User.findById(obj.comment.userId)
+            }
         }
-
         logger.debug(`_getCustomer comment 3: ${JSON.stringify(obj)}`)
     }
     if (obj.threadId) {
         var thread = yield Thread.findById(obj.threadId)
-        obj.thread = threadController._json(thread)
-        if (obj.thread && obj.thread.userId ) {
-            obj.thread.user = yield User.findById(obj.thread.userId)
+        if (thread) {
+            obj.thread = threadController._json(thread)
+            if (obj.thread && obj.thread.userId ) {
+                obj.thread.user = yield User.findById(obj.thread.userId)
+            }
         }
     }
     if (obj.userId) {
@@ -279,10 +295,10 @@ var _json = (report) => {
         threadId : report.threadId,
         userId : report.userId,
 
-        create_at : report.create_at,
-        update_at : report.update_at,
-        createdAtFormat: report.createdAtFormat,
-        updatedAtFormat: report.updatedAtFormnpmat
+        createAt : report.createAt,
+        updateAt : report.updateAt,
+        createdAtFormat: report.createdAtFormat(),
+        updatedAtFormat: report.updatedAtFormnpmat()
     }
 }
 

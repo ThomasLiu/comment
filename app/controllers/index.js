@@ -15,6 +15,8 @@ const $models = require('../common/mount-models')(__dirname)
 const AppSecret = $models.appSecret
 const Comment = $models.comment
 
+const commentsControllers = require('./comments')
+
 
 const notJump = [
     '/active_account', //active page
@@ -39,8 +41,13 @@ exports.index = function *(next){
         },
         attributes = null,
         result,
-        logErr
-
+        logErr,
+        data = {
+            current_page: page,
+            sortby: sort,
+            title: 'Comment List'
+        }
+    logger.debug(`where : ${JSON.stringify(where)}`)
     try {
         result = yield Comment.findAndCountAll({
             where : where,
@@ -49,9 +56,25 @@ exports.index = function *(next){
             sort: sort,
             field: attributes
         })
+        const all_count = result.count
+        data.pages = Math.ceil(all_count / limit)
+        data.all_count = all_count
+        if (result.rows && result.rows.length > 0) {
+            var rows = result.rows,
+                newRows = new Array()
+            for (var i in rows) {
+                if(rows[i]) {
+                    var item = commentsControllers._json(rows[i])
+                    var newItem = yield commentsControllers._getCustomer(item)
+                    newRows.push(newItem)
+                }
+            }
+            data.list = newRows
+        }
     } catch (error) {
         logErr = error
     }
+    logger.debug(`result : ${JSON.stringify(data.list)}`)
     
     if (logErr){
         yield this.render('error', {
@@ -59,17 +82,7 @@ exports.index = function *(next){
             error: {status: 204, stack: 'api error' }
         })
     } else {
-        const all_count = result.count
-        const pages = Math.ceil(all_count / limit)
-
-        yield this.render('index', {
-            current_page: page,
-            pages: pages,
-            all_count: all_count,
-            sortby: sort,
-            list: result.rows,
-            title: 'Comment List'
-        })
+        yield this.render('index', data)
     }
     
 }

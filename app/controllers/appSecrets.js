@@ -109,10 +109,10 @@ var _json = (appSecret) => {
         id : appSecret._id,
         appId : appSecret.appId,
         appSecret : appSecret.appSecret,
-        create_at : appSecret.create_at,
-        update_at : appSecret.update_at,
-        createdAtFormat: appSecret.createdAtFormat,
-        updatedAtFormat: appSecret.updatedAtFormnpmat
+        createAt : appSecret.createAt,
+        updateAt : appSecret.updateAt,
+        createdAtFormat: appSecret.createdAtFormat(),
+        updatedAtFormat: appSecret.updatedAtFormnpmat()
     }
 }
 

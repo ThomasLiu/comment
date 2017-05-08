@@ -40,35 +40,24 @@ exports.authUser = function *(next) {
         return yield next
     }
 
-    var appSecret
-    if (session.appSecret) {
-        appSecret = session.appSecret
-    } else {
-        var auth_token = session[Config.auth_cookie_name]
-        if (!auth_token) {
-            return yield next
-        }
-
-        var auth = auth_token.split('$$$$')
-        if (auth.length < 2 ) {
-            return yield next
-        }
-
-        var appSecretId = auth[0]
-        var appId = auth[1]
-        var appSecret = auth[2]
-
-        appSecret = {
-            appSecretId: appSecretId,
-            appId: appId,
-            appSecret: appSecret
-        }
-    }
-
-    if (!appSecret) {
+    var auth_token = session[Config.auth_cookie_name]
+    if (!auth_token) {
         return yield next
     }
-    this.state.current_user = session.appSecret = appSecret
+
+    var auth = auth_token.split('$$$$')
+    if (auth.length < 2 ) {
+        return yield next
+    }
+
+    var appSecretId = auth[0]
+    var appId = auth[1]
+    var appSecret = auth[2]
+
+
+    this.session.appSecretId = appSecretId
+    this.session.appId = appId
+    this.session.appSecret = appSecret
 
     yield next
 

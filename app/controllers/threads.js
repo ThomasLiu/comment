@@ -175,10 +175,10 @@ var _json = (thread) => {
 
         userId : thread.userId,
 
-        create_at : thread.create_at,
-        update_at : thread.update_at,
-        createdAtFormat: thread.createdAtFormat,
-        updatedAtFormat: thread.updatedAtFormnpmat
+        createAt : thread.createAt,
+        updateAt : thread.updateAt,
+        createdAtFormat: thread.createdAtFormat(),
+        updatedAtFormat: thread.updatedAtFormnpmat()
     }
 }
 exports._json = _json
